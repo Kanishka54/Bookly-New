@@ -1,0 +1,5 @@
+node_modules
+.env
+hw.txt
+venv/
+.vercel
