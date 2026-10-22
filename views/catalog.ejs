@@ -14,7 +14,7 @@
     />
     <link rel="stylesheet" href="/style.css" />
   </head>
-  <body>
+  <body class="catalog-page">
     <header class="header">
       <div class="header-1">
         <a href="/" class="logo"> <i class="fas fa-book"></i> Book Bazaar </a>
@@ -121,7 +121,7 @@
       </form>
     </div>
 
-    <h1 class="heading"><span><%= heading %></span></h1>
+    <h1 class="heading catalog-heading"><span><%= heading %></span></h1>
     <p class="catalog-count">
       <% if (total === 0) { %>
         No books found.
@@ -160,7 +160,7 @@
                 data-price="<%= book.price %>"
                 data-image="<%= book.image %>"
               >
-                Add to Cart
+                Add to cart
               </button>
             </div>
           </div>

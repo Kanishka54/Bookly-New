@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600&family=Inter:wght@400;500;600&display=swap");
 
 :root {
   --green: #da0735;
@@ -1208,4 +1208,64 @@ section {
 .pagination a.pagination-link:hover {
   background: var(--black);
   color: #fff;
+}
+
+/* Catalog + pagination typography (does not override Font Awesome) */
+.catalog-heading,
+.catalog-heading span,
+.catalog-page .catalog-count,
+.catalog-page .catalog-empty,
+.product-details,
+.product-details h2,
+.product-details p,
+.product-details .price,
+.product-details .btn,
+.pagination,
+.pagination-link {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  text-transform: none;
+}
+
+.catalog-heading span {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.product-details h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.product-details > p {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--light-color);
+}
+
+.product-details .price,
+.product-details .price p {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.product-details .btn.add-to-cart {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.catalog-page .catalog-count,
+.catalog-page .catalog-empty {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.pagination-link {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.pagination-link.current {
+  font-weight: 500;
 }
