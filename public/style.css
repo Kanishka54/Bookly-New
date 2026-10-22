@@ -1269,3 +1269,68 @@ section {
 .pagination-link.current {
   font-weight: 500;
 }
+
+/* Catalog layout: centered grid, scoped so homepage sliders stay unchanged */
+.catalog-layout {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.catalog-page .catalog-count {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.catalog-page .productdetailpage {
+  display: block;
+  margin: 0;
+}
+
+.catalog-page .book-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  justify-content: initial;
+  align-items: stretch;
+  padding: 0;
+  margin: 0;
+}
+
+.catalog-page .book-item {
+  width: auto;
+  margin: 0;
+  min-width: 0;
+}
+
+.catalog-page .product-box {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 300px;
+  margin: 0;
+}
+
+.catalog-page .pagination {
+  justify-content: center;
+  padding: 2rem 0 5rem;
+}
+
+@media (max-width: 768px) {
+  .catalog-layout {
+    padding: 0 16px;
+  }
+
+  .catalog-page .book-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .catalog-page .book-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

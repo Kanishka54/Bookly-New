@@ -121,56 +121,58 @@
       </form>
     </div>
 
-    <h1 class="heading catalog-heading"><span><%= heading %></span></h1>
-    <p class="catalog-count">
-      <% if (total === 0) { %>
-        No books found.
-      <% } else { %>
-        Showing page <%= page %> of <%= totalPages %> (<%= total %> books)
-      <% } %>
-    </p>
+    <div class="catalog-layout">
+      <h1 class="heading catalog-heading"><span><%= heading %></span></h1>
+      <p class="catalog-count">
+        <% if (total === 0) { %>
+          No books found.
+        <% } else { %>
+          Showing page <%= page %> of <%= totalPages %> (<%= total %> books)
+        <% } %>
+      </p>
 
-    <div class="productdetailpage">
-      <% if (books.length === 0) { %>
-      <p class="catalog-empty"><%= emptyMessage %></p>
-      <% } else { %>
-      <ul class="book-list">
-        <% books.forEach(function (book) { %>
-        <li class="book-item">
-          <div class="product-box">
-            <a
-              href="#"
-              class="fas fa-heart"
-              onclick="addToFavorites('<%= book.id %>')"
-            ></a>
-            <div class="product-image">
-              <a href="/bookdetails?id=<%= book.id %>">
-                <img src="<%= book.image %>" alt="<%= book.title %>" />
-              </a>
-            </div>
-            <div class="product-details">
-              <h2><%= book.title %></h2>
-              <p><%= book.author %></p>
-              <div class="price">
-                <p>₹<%= Number(book.price).toFixed(2) %></p>
+      <div class="productdetailpage">
+        <% if (books.length === 0) { %>
+        <p class="catalog-empty"><%= emptyMessage %></p>
+        <% } else { %>
+        <ul class="book-list">
+          <% books.forEach(function (book) { %>
+          <li class="book-item">
+            <div class="product-box">
+              <a
+                href="#"
+                class="fas fa-heart"
+                onclick="addToFavorites('<%= book.id %>')"
+              ></a>
+              <div class="product-image">
+                <a href="/bookdetails?id=<%= book.id %>">
+                  <img src="<%= book.image %>" alt="<%= book.title %>" />
+                </a>
               </div>
-              <button
-                class="btn add-to-cart"
-                data-name="<%= book.title %>"
-                data-price="<%= book.price %>"
-                data-image="<%= book.image %>"
-              >
-                Add to cart
-              </button>
+              <div class="product-details">
+                <h2><%= book.title %></h2>
+                <p><%= book.author %></p>
+                <div class="price">
+                  <p>₹<%= Number(book.price).toFixed(2) %></p>
+                </div>
+                <button
+                  class="btn add-to-cart"
+                  data-name="<%= book.title %>"
+                  data-price="<%= book.price %>"
+                  data-image="<%= book.image %>"
+                >
+                  Add to cart
+                </button>
+              </div>
             </div>
-          </div>
-        </li>
-        <% }); %>
-      </ul>
-      <% } %>
-    </div>
+          </li>
+          <% }); %>
+        </ul>
+        <% } %>
+      </div>
 
-    <%- include('partials/pagination') %>
+      <%- include('partials/pagination') %>
+    </div>
 
     <script src="/style.js"></script>
     <script src="/add_book.js"></script>
