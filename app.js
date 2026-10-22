@@ -161,25 +161,30 @@ app.get("/get-logged-in-user-id", (req, res) => {
 });
 
 app.get("/bookdetails", async (req, res) => {
-  const bookId = req.query.id; // Get the book ID from the query parameter
+  const bookId = req.query.id;
   const user = req.session.user;
+  const showDropdown = !!user;
+
+  if (!mongoose.isValidObjectId(bookId)) {
+    return res.status(400).send("Invalid book ID");
+  }
+
   try {
     const book = await Book.findById(bookId);
     if (book) {
-      res.render("bookdetails", { book, showDropdown, user });
-    } else {
-      // res.status(404).send('Book not found');
-      res.status(404).send(`
+      return res.render("bookdetails", { book, showDropdown, user });
+    }
+    return res.status(404).send(`
         <p>Book not found</p>
         <script>
             setTimeout(function(){
                 window.location.href = '/';
-            }, 2000); // Redirects after 5 seconds
+            }, 2000);
         </script>
     `);
-    }
   } catch (error) {
-    res.status(500).send("Internal Server Error");
+    console.error("Error loading book details:", error.message);
+    return res.status(500).send("Internal Server Error");
   }
 });
 
