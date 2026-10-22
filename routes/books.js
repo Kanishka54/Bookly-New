@@ -10,6 +10,7 @@ const {
 } = require("../utils/cloudinary"); // Adjust path as necessary
 
 const User = require("../models/User");
+const { paginateBooks } = require("../utils/paginateBooks");
 const fs = require("fs");
 
 // // Configure multer for handling file uploads
@@ -41,6 +42,45 @@ function isAuthenticated(req, res, next) {
 
 router.get("/checkAuthentication", isAuthenticated, (req, res) => {
   res.json({ isAuthenticated: true });
+});
+
+router.get("/", async (req, res) => {
+  const user = req.session.user;
+  const showDropdown = !!user;
+
+  try {
+    const pagination = await paginateBooks({
+      q: req.query.q,
+      category: req.query.category,
+      page: req.query.page,
+      pathname: "/books",
+    });
+
+    let heading = "all books";
+    if (pagination.category && pagination.q) {
+      heading = `${pagination.category}: "${pagination.q}"`;
+    } else if (pagination.category) {
+      heading = pagination.category;
+    } else if (pagination.q) {
+      heading = `search: "${pagination.q}"`;
+    }
+
+    let emptyMessage = "No books are listed yet.";
+    if (pagination.category || pagination.q) {
+      emptyMessage = "No books matched these filters.";
+    }
+
+    res.render("catalog", {
+      user,
+      showDropdown,
+      heading,
+      emptyMessage,
+      ...pagination,
+    });
+  } catch (error) {
+    console.error("Error loading catalog:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 router.post(

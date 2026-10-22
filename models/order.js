@@ -22,6 +22,9 @@ const orderSchema = new mongoose.Schema(
         },
     ],
 
+    mobileRequestKey: { type: String, unique: true, sparse: true },
+    mobileTitles: [String],
+
     totalAmount: {
         type: Number,
         required: true,

@@ -28,7 +28,11 @@
             name="q"
             placeholder="search here..."
             id="search-box"
+            value="<%= query %>"
           />
+          <% if (typeof category !== 'undefined' && category) { %>
+          <input type="hidden" name="category" value="<%= category %>" />
+          <% } %>
           <label for="search-box" class="fas fa-search"></label>
         </form>
 
@@ -67,7 +71,8 @@
       <div class="header-2">
         <nav class="navbar">
           <h2 class="navbar1" style="color: whitesmoke">
-            Search Results for "<%= query %>"
+            Search Results<% if (query) { %> for "<%= query %>"<% } %>
+            <% if (typeof category !== 'undefined' && category) { %> in <%= category %><% } %>
           </h2>
         </nav>
       </div>
@@ -159,10 +164,11 @@
       <% } else { %>
       <div class="search-results-container">
         <p style="font-size: 18px; color: #555; font-weight: bold">
-          No Books Found for "<%= query %>"
+          No Books Found<% if (query) { %> for "<%= query %>"<% } %>.
         </p>
       </div>
       <% } %>
+      <%- include('partials/pagination') %>
     </div>
 
     <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>

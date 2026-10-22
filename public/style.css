@@ -1149,3 +1149,63 @@ section {
 .price {
   font-weight: bold;
 }
+
+.catalog-count {
+  text-align: center;
+  font-size: 1.6rem;
+  color: var(--light-color);
+  margin: 0 9% 2rem;
+}
+
+.catalog-count a {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.catalog-empty {
+  width: 100%;
+  text-align: center;
+  font-size: 1.8rem;
+  color: var(--light-color);
+  padding: 3rem 1rem;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 2rem 9% 5rem;
+}
+
+.pagination-link {
+  display: inline-block;
+  min-width: 3.6rem;
+  padding: 0.6rem 1.2rem;
+  border: var(--border);
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--black);
+  background: #fff;
+}
+
+.pagination-link.current {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+  font-weight: 600;
+}
+
+.pagination-link.disabled {
+  color: #bbb;
+  background: #f5f5f5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pagination a.pagination-link:hover {
+  background: var(--black);
+  color: #fff;
+}

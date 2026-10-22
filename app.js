@@ -20,6 +20,7 @@ const crypto = require("crypto");
 
 const Rating = require("./models/Ratings");
 const User = require("./models/User");
+const { paginateBooks, PAGE_SIZE } = require("./utils/paginateBooks");
 require("dotenv").config();
 // Database connection setup
 const razorpay = new Razorpay({
@@ -85,12 +86,13 @@ const bookRoutes = require("./routes/books");
 // Use the authRouter for dashboard and login routesapp.get("/categories"
 app.use("/auth", authRouter);
 app.use("/books", bookRoutes);
+app.use("/api/mobile", require("./routes/mobile")());
 // let showDropdown;
 app.get("/", async (req, res) => {
   const user = req.session.user;
 
   try {
-    const books = await Book.find({});
+    const books = await Book.find({}).sort({ _id: -1 }).limit(PAGE_SIZE);
     const ratings = await Rating.find({});
 
     const showDropdown = !!user; // true if user exists
@@ -184,16 +186,21 @@ app.get("/bookdetails", async (req, res) => {
 // Add this route to handle search requests
 app.get("/search", async (req, res) => {
   const user = req.session.user;
-   const showDropdown = !!user;
-  const query = req.query.q;
+  const showDropdown = !!user;
   try {
-    const results = await Book.find({
-      $or: [
-        { title: { $regex: new RegExp(query, "i") } },
-        { author: { $regex: new RegExp(query, "i") } },
-      ],
+    const pagination = await paginateBooks({
+      q: req.query.q,
+      category: req.query.category,
+      page: req.query.page,
+      pathname: "/search",
     });
-    res.render("searchresults", { results, query, showDropdown, user }); // Pass results to the view
+    res.render("searchresults", {
+      results: pagination.books,
+      query: pagination.q,
+      showDropdown,
+      user,
+      ...pagination,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -303,33 +310,51 @@ app.get("/favorites", async (req, res) => {
 
 app.get("/categories", async (req, res) => {
   try {
-    const categories =
-      await Book.distinct("category").exec();
-
-    console.log(categories);
-
     const user = req.session.user;
     const showDropdown = !!user;
+    const selectedCategory = Array.isArray(req.query.category)
+      ? req.query.category[0]
+      : req.query.category;
 
+    if (selectedCategory) {
+      const pagination = await paginateBooks({
+        q: req.query.q,
+        category: selectedCategory,
+        page: req.query.page,
+        pathname: "/categories",
+      });
+
+      return res.render("catalog", {
+        user,
+        showDropdown,
+        heading: pagination.q
+          ? `${pagination.category}: "${pagination.q}"`
+          : pagination.category,
+        emptyMessage: "No books in this category.",
+        ...pagination,
+      });
+    }
+
+    const categories = await Book.distinct("category").exec();
     const groupedBooks = {};
 
     for (const category of categories) {
-      groupedBooks[category] =
-        await Book.find({
-          category: category
-        }).exec();
+      if (!category) {
+        continue;
+      }
+      groupedBooks[category] = await Book.find({ category })
+        .sort({ _id: -1 })
+        .limit(PAGE_SIZE);
     }
-
-    console.log(groupedBooks);
 
     res.render("categories", {
       groupedBooks,
       showDropdown,
-      user
+      user,
     });
-
   } catch (error) {
     console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
