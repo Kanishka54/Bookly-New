@@ -10,6 +10,7 @@ const cloudinary = require('cloudinary').v2;
 const User = require('../models/User');
 const Book = require('../models/Book');
 const Order = require('../models/order');
+const { placeRequest, cancelRequest } = require('../utils/placeRequest');
 
 module.exports = function mobileApi(options = {}) {
   const secret = options.secret || process.env.SESSION_SECRET;
@@ -151,30 +152,20 @@ module.exports = function mobileApi(options = {}) {
     res.sendStatus(204);
   }));
   router.post('/orders', signedIn, asyncRoute(async (req, res) => {
-    const key = req.get('Idempotency-Key');
-    if (!/^[a-zA-Z\d-]{8,100}$/.test(key || '')) fail(400, 'A request ID is required.');
-    const requestKey = `${req.mobileUser._id}:${key}`;
-    let order = await Order.findOne({ mobileRequestKey: requestKey }).populate('books.book');
-    if (order) return res.json(orderDto(order));
-    const session = await mongoose.startSession();
-    try {
-      await session.withTransaction(async () => {
-        order = await Order.findOne({ mobileRequestKey: requestKey }).session(session);
-        if (order) return;
-        const user = await User.findById(req.mobileUser._id).session(session);
-        if (!user.mobileCart.length) fail(400, 'Your bag is empty.');
-        const books = await Book.find({ _id: { $in: user.mobileCart } }).session(session);
-        if (books.length !== user.mobileCart.length || books.some(b => !(b.quantity > 0) || owns(b, user) || !Number.isFinite(b.price) || b.price < 0)) fail(409, 'A book is unavailable. Refresh your bag.');
-        // A request is unpaid and does not reserve or decrement stock.
-        [order] = await Order.create([{ user: user._id, books: books.map(b => ({ book: b._id, quantity: 1 })), totalAmount: Math.round(books.reduce((n, b) => n + b.price, 0) * 100) / 100, status: 'Requested', mobileRequestKey: requestKey, mobileTitles: books.map(b => b.title) }], { session });
-        await User.updateOne({ _id: user._id }, { $pull: { mobileCart: { $in: user.mobileCart } } }, { session });
-      });
-    } catch (e) {
-      if (e.code !== 11000) throw e;
-      order = await Order.findOne({ mobileRequestKey: requestKey });
-      if (!order) throw e;
-    } finally { await session.endSession(); }
-    res.status(201).json(orderDto(order));
+    const user = await User.findById(req.mobileUser._id);
+    const { order, replay } = await placeRequest({
+      buyer: user,
+      bookIds: user.mobileCart,
+      idempotencyKey: req.get('Idempotency-Key'),
+      clearCart: true,
+    });
+    const populated = await Order.findById(order._id).populate('books.book');
+    res.status(replay ? 200 : 201).json(orderDto(populated));
+  }));
+  router.post('/orders/:id/cancel', signedIn, asyncRoute(async (req, res) => {
+    const order = await cancelRequest({ buyer: req.mobileUser, orderId: req.params.id });
+    const populated = await Order.findById(order._id).populate('books.book');
+    res.json(orderDto(populated));
   }));
   router.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) return res.status(400).json({ message: 'Choose one photo under 5 MB.' });

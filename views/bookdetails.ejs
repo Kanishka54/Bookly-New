@@ -294,7 +294,15 @@
           data-image="<%= book.image %>">Add to Cart</button>
       </div> -->
       <div class="buy-section">
-        <button onclick="buyNow()">Buy Now</button>
+        <button
+          type="button"
+          id="buy-now-btn"
+          data-book-id="<%= book.id %>"
+          <% if (!(book.quantity > 0)) { %>disabled<% } %>
+        >Buy Now</button>
+        <p id="buy-now-message" <% if (book.quantity > 0) { %>hidden<% } %>>
+          <% if (!(book.quantity > 0)) { %>This book is unavailable.<% } %>
+        </p>
         <button class="add-to-cart" data-name="<%= book.title %>" data-price="<%= book.price %>" data-image="<%= book.image %>">Add to Cart</button>
       </div>
     </div>
@@ -333,6 +341,7 @@
   <script src="/style.js"></script>
   <script src="/add_book.js"></script>
   <script src="/cart.js"></script>
+  <script src="/requestBook.js"></script>
 
   <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
   <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
@@ -370,28 +379,7 @@
       }
     }
 
-    // Define the buyNow function in the global scope
-    async function buyNow() {
-      // Fetch the logged in user ID if it's not already set
-      if (loggedInUserId === null) {
-        loggedInUserId = await fetchLoggedInUserId();
-      }
-
-      if (loggedInUserId) {
-        var title = '<%= book.title %>';
-        var price = '<%= book.price %>';
-        var image = '<%= book.image %>';
-        var mail = '<%= book.userEmail %>';
-
-        // Redirect to the new page with the encoded parameters
-        window.location.href = "newPage.html?title=" + encodeURIComponent(title) +
-          "&price=" + encodeURIComponent(price) +
-          "&image=" + encodeURIComponent(image) +
-          "&mail=" + encodeURIComponent(mail);
-      } else {
-        alert("Please log in before ordering!");
-      }
-    }
+    // Buy Now is handled by /requestBook.js so retries reuse one idempotency key.
 
     document.addEventListener('DOMContentLoaded', async function() {
       // Fetch the logged in user ID when the page loads

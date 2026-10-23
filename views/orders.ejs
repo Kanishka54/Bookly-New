@@ -1,10 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <title>My Orders</title>
-</head>
-<body>
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+      .order-list {
+        max-width: 720px;
+        margin: 2rem auto;
+        font-family: Inter, system-ui, sans-serif;
+      }
+      .order-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 1rem;
+      }
+      .order-card button {
+        margin-top: 0.6rem;
+        padding: 0.5rem 1rem;
+        background: #da0735;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .order-card button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
     <h1>My Orders</h1>
-    <p>No orders yet.</p>
-</body>
+    <p><a href="/">Back to home</a></p>
+    <div class="order-list">
+      <% if (!orders.length) { %>
+      <p>No orders yet.</p>
+      <% } else { %> <% orders.forEach(function (order) { %>
+      <div class="order-card">
+        <p>Status: <%= order.status %></p>
+        <p>Total: ₹<%= order.totalAmount %></p>
+        <p>
+          Books:
+          <%= (order.mobileTitles && order.mobileTitles.length) ? order.mobileTitles.join(", ") : (order.books || []).map(function (line) { return line.book && line.book.title; }).filter(Boolean).join(", ") %>
+        </p>
+        <% if (order.status === "Requested") { %>
+        <button
+          type="button"
+          class="cancel-request"
+          data-order-id="<%= order.id %>"
+        >
+          Cancel request
+        </button>
+        <% } %>
+      </div>
+      <% }); %> <% } %>
+    </div>
+    <script>
+      document.querySelectorAll(".cancel-request").forEach(function (button) {
+        button.addEventListener("click", async function () {
+          button.disabled = true;
+          try {
+            const response = await fetch(
+              "/orders/" + button.getAttribute("data-order-id") + "/cancel",
+              { method: "POST", headers: { "Content-Type": "application/json" } }
+            );
+            const result = await response.json().catch(function () {
+              return {};
+            });
+            alert(result.message || (response.ok ? "Cancelled." : "Could not cancel."));
+            if (response.ok) {
+              window.location.reload();
+            }
+          } catch (err) {
+            alert("Network error. You can try again.");
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

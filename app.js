@@ -87,6 +87,7 @@ const bookRoutes = require("./routes/books");
 app.use("/auth", authRouter);
 app.use("/books", bookRoutes);
 app.use("/api/mobile", require("./routes/mobile")());
+app.use("/orders", require("./routes/orders"));
 // let showDropdown;
 app.get("/", async (req, res) => {
   const user = req.session.user;
@@ -483,9 +484,6 @@ app.post("/verify-payment", (req, res) => {
       message: "Payment Verification Failed",
     });
   }
-});
-app.get("/orders", (req, res) => {
-    res.render("orders");
 });
 // Start the server
 app.listen(port, () => {

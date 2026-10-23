@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema(
     ],
 
     mobileRequestKey: { type: String, unique: true, sparse: true },
+    requestFingerprint: { type: String },
     mobileTitles: [String],
 
     totalAmount: {
